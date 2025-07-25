@@ -1,0 +1,9 @@
+django 
+psycopg[binary]
+djangorestframework
+redis 
+celery 
+python-decouple 
+pandas
+openpyxl
+gunicorn

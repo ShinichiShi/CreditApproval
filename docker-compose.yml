@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env.local
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_DB: credit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+  
+  celery:
+    build: .
+    command: celery -A credit_system worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env.local
+
+volumes:
+  postgres_data:
