@@ -15,7 +15,7 @@ class Customer(models.Model):
 
 
 class Loan(models.Model):
-    loan_id = models.IntegerField(primary_key=True)
+    loan_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="loans")
     loan_amount = models.FloatField()
     tenure = models.PositiveIntegerField(help_text="Tenure in months")
