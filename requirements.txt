@@ -7,3 +7,6 @@ python-decouple
 pandas
 openpyxl
 gunicorn
+drf-yasg
+pillow
+whitenoise
