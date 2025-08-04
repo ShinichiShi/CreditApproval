@@ -77,5 +77,9 @@ if Loan.objects.exists():
     print('Sample loan:', Loan.objects.first().__dict__)
 "
 
-echo "🚀 Starting Gunicorn..."
-exec gunicorn credit_system.wsgi:application --bind 0.0.0.0:8000
+echo "🚀 Starting Gunicorn with OpenTelemetry..."
+exec opentelemetry-instrument \
+    --traces_exporter otlp \
+    --metrics_exporter none \
+    --service_name credit-approval-api \
+    gunicorn credit_system.wsgi:application --bind 0.0.0.0:8000

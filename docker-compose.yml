@@ -13,6 +13,11 @@ services:
       - .env.local
     environment:
       - DJANGO_LOG_LEVEL=INFO
+      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_SERVICE_NAME=credit-approval-api
+      - OTEL_EXPORTER_OTLP_INSECURE=true 
+      - DJANGO_SETTINGS_MODULE=credit_system.settings
     depends_on:
       - db
       - redis
@@ -46,6 +51,35 @@ services:
 
   redis:
     image: redis:7
-
+  
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+    - "9090:9090"
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+  flower:
+    image: mher/flower
+    command: celery --broker=redis://redis:6379/0 flower --port=5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes:
+      - ./otel-config.yaml:/etc/otel/config.yaml
+    ports:
+      - "4317:4317"
 volumes:
   postgres_data:
